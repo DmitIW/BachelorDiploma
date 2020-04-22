@@ -1,5 +1,7 @@
 import io
 import random
+import warnings
+
 import numpy as np
 
 import tensorflow as tf
@@ -9,6 +11,7 @@ import cv2
 
 from keras.callbacks import TensorBoard
 from keras.callbacks import Callback
+
 
 class ImagesTensorBoard(TensorBoard):
 
@@ -24,27 +27,20 @@ class ImagesTensorBoard(TensorBoard):
             
 #             self.test_images = random.sample(list(random_imgs), 3)
             self.test_images = np.array(random_imgs)
-        
-        
+
     def on_epoch_end(self, epoch, logs=None):
         super(ImagesTensorBoard, self).on_epoch_end(epoch, logs)
 
         if self.generator:
         
             pred_images = self.model.predict(self.test_images)
-            
+
+            print("Epoch: {}, train image:".format(epoch))
+
             fig = self.get_fig(self.test_images, pred_images)
-            
-            s = io.BytesIO()
-            fig.savefig(s, format='png')
-            image = tf.Summary().Image(encoded_image_string=s.getvalue())
 
-            im_summary = tf.Summary().Value(tag="Predict", image=image)
-            summary = tf.Summary(value=[im_summary])
+            tf.summary.image("Test data", self.plot_to_image(fig), step=0)
 
-            
-            
-            self.writer.add_summary(summary, epoch)
         self.writer.flush()
 
     def get_fig(self, test_images, pred_images, r=2, c=3):
@@ -58,9 +54,17 @@ class ImagesTensorBoard(TensorBoard):
             axs[1, i].axis('off')
                 
         return fig
-    
-    
-    
+
+    def plot_to_image(self, figure):
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png")
+        plt.close(figure)
+        buf.seek(0)
+        image = tf.image.decode_png(buf.getvalue(), channels=4)
+        image = tf.expand_dims(image, 0)
+        return image
+
+
 class EarlyStoppingByLossVal(Callback):
     def __init__(self, monitor='val_acc', value=0.98, verbose=0):
         super(Callback, self).__init__()

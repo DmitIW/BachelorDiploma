@@ -84,8 +84,8 @@ def unet_modify(pretrained_weights = None,input_size = (256,256,3)):
     
     #model.summary()
 
-    if(pretrained_weights):
-    	model.load_weights(pretrained_weights)
+    if pretrained_weights:
+        model.load_weights(pretrained_weights)
 
     return model
 
@@ -139,11 +139,10 @@ def unet(pretrained_weights = None,input_size = (256,256,1)):
     
     #model.summary()
 
-    if(pretrained_weights):
-    	model.load_weights(pretrained_weights)
+    if pretrained_weights:
+        model.load_weights(pretrained_weights)
 
     return model
-
 
 
 def segnet(input_shape=(256, 256, 1), n_classes=1):
