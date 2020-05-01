@@ -1,11 +1,13 @@
 #!/bin/sh
 
+conda update -n base -c defaults conda
+
 echo "Jupyter"
 conda install   -y         -c conda-forge jupyterlab
 echo "Tensorflow"
 conda install   -y         -c anaconda tensorflow-gpu
 echo "Pytorch"
-conda install   -y         pytorch torchvision cudatoolkit=10.2 -c pytorch
+conda install   -y         pytorch torchvision cudatoolkit=10.1 -c pytorch
 echo "FastAi"
 conda install   -y         -c fastai fastai
 
