@@ -3,16 +3,17 @@
 conda update -n base -c defaults conda
 
 echo "Jupyter"
-conda install   -y         -c conda-forge jupyterlab
+conda install -y -c conda-forge jupyterlab
+conda install -y -c conda-forge ipywidgets
 echo "Tensorflow"
-conda install   -y         -c anaconda tensorflow-gpu
+conda install -y -c anaconda tensorflow-gpu
 echo "Pytorch"
-conda install   -y         pytorch torchvision cudatoolkit=10.1 -c pytorch
+conda install -y pytorch torchvision cudatoolkit=10.1 -c pytorch
 echo "FastAi"
-conda install   -y         -c fastai fastai
+conda install -y -c fastai fastai
 
 conda uninstall -y --force pillow pil jpeg libtiff libjpeg-turbo
-pip   uninstall -y         pillow pil jpeg libtiff libjpeg-turbo
+pip uninstall -y pillow pil jpeg libtiff libjpeg-turbo
 
 conda install -yc conda-forge libjpeg-turbo
 CFLAGS="${CFLAGS} -mavx2" pip install -v --upgrade --no-cache-dir --force-reinstall --no-binary :all: --compile pillow-simd==6.1.0.post1
