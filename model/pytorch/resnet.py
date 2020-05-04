@@ -9,3 +9,7 @@ from model.pytorch.utility import (
 
 def get_resnet34():
     return get_base(models.resnet34)
+
+
+def get_resnet50():
+    return get_base(models.resnet50)

@@ -7,6 +7,7 @@ conda install -y -c conda-forge jupyterlab
 conda install -y -c conda-forge ipywidgets
 echo "Tensorflow"
 conda install -y -c anaconda tensorflow-gpu
+conda install -y -c conda-forge tensorboardx
 echo "Pytorch"
 conda install -y pytorch torchvision cudatoolkit=10.1 -c pytorch
 echo "FastAi"
