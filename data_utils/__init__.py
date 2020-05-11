@@ -1,8 +1,12 @@
-from data_utils.data_environment import set_data_environment
-from data_utils.utility import _change_void_val
-from data_utils.data_loader import SegItemListCustom, ImageListVertical, SegmentationItemListTwoSourceFoldersProb
-
 from fastai.vision import TfmPixel
+
+from data_utils.data_environment import set_data_environment
+from data_utils.data_loader import (
+    SegItemListCustom, ImageListVertical, SegmentationItemListTwoSourceFoldersProb,
+    SegmentationItemListSplitBatch
+)
+from data_utils.utility import _change_void_val
+from data_utils.datasets import SeveralSourceDataset
 
 
 def change_void_val(): return [TfmPixel(_change_void_val)()]
@@ -19,5 +23,7 @@ __all__ = [
     change_void_val_tv,
     SegItemListCustom,
     ImageListVertical,
-    SegmentationItemListTwoSourceFoldersProb
+    SegmentationItemListTwoSourceFoldersProb,
+    SegmentationItemListSplitBatch,
+    SeveralSourceDataset
 ]

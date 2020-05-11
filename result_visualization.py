@@ -3,7 +3,7 @@ from fastai.vision import plt
 
 def show_results(td, learner):
     size = len(td.test_ds)
-    _,axs = plt.subplots(size,3, figsize=(26,35))
+    _, axs = plt.subplots(size, 3, figsize=(26, 35))
     for num, image in enumerate(td.test_ds):
         pred = learner.predict(image[0])[0]
         _ax = axs

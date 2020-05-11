@@ -6,16 +6,10 @@ path_to_data = "/home/dmitri/Documents/Datasets/skyFinder"
 data_dirs = set_data_environment(path_to_data, subdirs={
     "train_images": "train",
     "train_labels": "train_labels",
-    "train_red": "train_red",
-    "train_red_labels": "train_red_labels",
-    "train_green": "train_green",
-    "train_green_labels": "train_green_labels",
+    "train_images_p": "train_p",
+    "train_p_labels": "train_p_labels",
     "val_images": "val",
     "val_labels": "val_labels",
-    "val_red": "train_red",
-    "val_red_labels": "train_red_labels",
-    "val_green": "train_green",
-    "val_green_labels": "train_green_labels",
     "transfer vertical": "td_vertical",
     "transfer horizontal": "td_horizontal"
 })
