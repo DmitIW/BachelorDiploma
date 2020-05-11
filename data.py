@@ -2,16 +2,22 @@ from functools import partial
 
 from data_utils import set_data_environment
 
-path_to_data = "/home/dmitri/Documents/Datasets/skyFinder"
+path_to_data = "/home/dmitri/Documents/Datasets/skyFinderMod"
 data_dirs = set_data_environment(path_to_data, subdirs={
-    "train_images": "train",
-    "train_labels": "train_labels",
-    "train_images_p": "train_p",
-    "train_p_labels": "train_p_labels",
-    "val_images": "val",
-    "val_labels": "val_labels",
-    "transfer vertical": "td_vertical",
-    "transfer horizontal": "td_horizontal"
+    "train images skyFinder": "train",
+    "train labels skyFinder": "train_labels",
+    "train images raw": "train_raw",
+    "train labels raw": "train_raw_labels",
+    "train images labeled": "train_labeled",
+    "train labels labeled": "train_labeled_labels",
+    "train images sky": "train_sky",
+    "train labels sky": "train_sky_labels",
+    "valid images skyFinder": "val_skyFinder",
+    "valid labels skyFinder": "val_skyFinder_labels",
+    "test images skyFinder": "test_skyFinder",
+    "test labels skyFinder": "test_skyFinder_labels",
+    "test iPhoneXR horizontal": "test_iphoneXR_h",
+    "test iPhoneXR vertical": "test_iphoneXR_v",
 })
 data_dirs.set_translation(
     lambda image_name: f"{image_name.stem}_L.png"
@@ -19,7 +25,8 @@ data_dirs.set_translation(
 
 
 def get_label(image, category):
-    return data_dirs.get_label(image, category + "_labels")
+    label_subdir_name = data_dirs.get_label_subdir_from_pair(category)
+    return data_dirs.get_label(image, label_subdir_name)
 
 
 def get_data_paths(category):
