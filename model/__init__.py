@@ -15,6 +15,8 @@ __all__ = [
     test_showing,
     jaccard_index_zero_class,
     jaccard_index_one_class,
+    get_jaccard_index_one_class_partial,
+    get_jaccard_index_zero_class_partial,
     f1_score,
     tensorboard_cb
 ]

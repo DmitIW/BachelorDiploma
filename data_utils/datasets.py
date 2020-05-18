@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Union, List, Tuple, Callable, Any
 
+import fastai
 from fastai.vision import (
     open_image, open_mask
 )
@@ -55,7 +56,14 @@ class SeveralSourceDataset(t_Dataset):
             index += 1
 
         self._inner_indexes: List[int] = [0 for _ in range(self._sources_count)]
-        self.transform = transforms
+        if type(transforms) != list:
+            raise RuntimeError(
+                "Unexpected transforms type. Should be list of fastai.vision.image.RandTransform or list of list of fastai.vision.image.RandTransform.")
+        if len(transforms) > 0:
+            if type(transforms[0]) == fastai.vision.image.RandTransform:
+                transforms = [transforms]
+
+        self.transform: List[List[Any]] = transforms
         self._size = size
 
     def __len__(self) -> int:

@@ -4,8 +4,8 @@ from data_utils import set_data_environment
 
 path_to_data = "/home/dmitri/Documents/Datasets/skyFinderMod"
 data_dirs = set_data_environment(path_to_data, subdirs={
-    "train images skyFinder": "train",
-    "train labels skyFinder": "train_labels",
+    "train images skyFinder": "train_skyFinder",
+    "train labels skyFinder": "train_skyFinder_labels",
     "train images raw": "train_raw",
     "train labels raw": "train_raw_labels",
     "train images labeled": "train_labeled",
@@ -16,8 +16,8 @@ data_dirs = set_data_environment(path_to_data, subdirs={
     "valid labels skyFinder": "val_skyFinder_labels",
     "test images skyFinder": "test_skyFinder",
     "test labels skyFinder": "test_skyFinder_labels",
-    "test iPhoneXR horizontal": "test_iphoneXR_h",
-    "test iPhoneXR vertical": "test_iphoneXR_v",
+    "test iPhoneXR images": "test_iphoneXR_v",
+    "test iPhoneXR labels": "test_iphoneXR_v_labels"
 })
 data_dirs.set_translation(
     lambda image_name: f"{image_name.stem}_L.png"
