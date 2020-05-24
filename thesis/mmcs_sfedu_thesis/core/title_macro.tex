@@ -1,0 +1,107 @@
+% Макросы настройки титульной страницы
+% В этот файл не предполагается вносить изменения
+
+%\usepackage {showframe}
+
+% Вертикальные отступы на титульной странице
+\newcommand{\vgap}{\vspace{16pt}}
+
+% Помещение города и даты в нижний колонтитул
+\usepackage{scrlayer}
+\DeclareNewLayer[
+  foot,
+  foreground,
+  contents={%
+    \raisebox{\dp\strutbox}[\layerheight][0pt]{%
+      \parbox[b]{\layerwidth}{\centering Ростов-на-Дону\\ \thedate%
+       \\\mbox{}
+       }}%
+  }
+]{titlepage.foot.fg}
+\DeclareNewPageStyleByLayers{titlepage}{titlepage.foot.fg}
+
+
+\AtBeginDocument %
+{ %
+  %
+  \begin{titlepage}
+  %
+    \thispagestyle{titlepage}
+
+    {\centering
+    %
+    \MakeTextUppercase {МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ РФ}
+
+    \vgap
+
+    Федеральное государственное автономное образовательное\\
+    учреждение высшего образования\\
+    \MakeTextUppercase {Южный федеральный университет}
+
+    \vgap
+
+	Институт математики, механики и компьютерных наук
+    имени~И.\,И.\,Воровича
+
+    \vgap
+
+    \direction
+
+    \ifthenelse{\boolean{needchair}}{
+    \vgap
+
+    \thechair}{}
+
+  
+
+    \ifthenelse{\value{worktype} = 2}{%
+    \me
+
+    \vgap}{}
+
+    %{\usefont{T2A}{PTSansCaption-TLF}{m}{n}
+    %\MakeTextUppercase{\thetitle}}
+
+    \vgap
+
+    Выпускная квалификационная работа\\
+    на степень бакалавра \\
+    \vgap
+    \vgap
+    \vgap
+    Ивахненко Д.И., 4 курс, 9 группа
+    
+    \vgap
+    {\usefont{T2A}{PTSansCaption-TLF}{m}{n}
+    \MakeTextUppercase{\thetitle}}
+    
+    \begin{flushright}
+    
+
+    \vgap
+
+    Научный руководитель:\\
+    \supervisor\\
+    \ifthenelse{\value{worktype} = 2}{%
+    Рецензент:\\
+    к.т.н, ст.преп.
+    М. В. Юрушкин
+    }{}
+    \vgap
+    Допущено к защите:\\
+    Заместитель директора ИММКН\\
+    по направлению ФИИТ\\
+    \vgap
+    \underline{\hspace{3cm}} В.С. Пилиди
+	\end{flushright}
+ 
+
+
+  }\end{titlepage}
+  %
+  %
+  \tableofcontents
+  %
+  \clearpage
+} %
+
