@@ -9,26 +9,26 @@ class DecoderBlockLinkNet(nn.Module):
 
         # B, C, H, W -> B, C/4, H, W
         self.conv1 = nn.Conv2d(in_channels, in_channels // 4, 1)
-        self.norm1 = nn.BatchNorm2d(in_channels // 4)
+        # self.norm1 = nn.BatchNorm2d(in_channels // 4)
 
         # B, C/4, H, W -> B, C/4, 2 * H, 2 * W
         self.deconv2 = nn.ConvTranspose2d(in_channels // 4, in_channels // 4, kernel_size=4,
                                           stride=2, padding=1, output_padding=0)
-        self.norm2 = nn.BatchNorm2d(in_channels // 4)
+        # self.norm2 = nn.BatchNorm2d(in_channels // 4)
 
         # B, C/4, H, W -> B, C, H, W
         self.conv3 = nn.Conv2d(in_channels // 4, n_filters, 1)
-        self.norm3 = nn.BatchNorm2d(n_filters)
+        # self.norm3 = nn.BatchNorm2d(n_filters)
 
     def forward(self, x):
         x = self.conv1(x)
-        x = self.norm1(x)
+        # x = self.norm1(x)
         x = self.relu(x)
         x = self.deconv2(x)
-        x = self.norm2(x)
+        # x = self.norm2(x)
         x = self.relu(x)
         x = self.conv3(x)
-        x = self.norm3(x)
+        # x = self.norm3(x)
         x = self.relu(x)
         return x
 
@@ -88,8 +88,29 @@ class LinkNet34(nn.Module):
         f4 = self.finalrelu2(f3)
         f5 = self.finalconv3(f4)
 
+        # print(
+        #     "Pre-softmax state; Size: {0},\n1. {1},\n2. {2}\n".format(
+        #         f5[0].size(),
+        #         f5[0, :, 5, 128].to('cpu', float),
+        #         f5[0, :, 128, 128].to('cpu', float)))
+        #
+        # only_softmax = F.softmax(f5, dim=1)
+        #
+        # print(
+        #     "Post-softmax state; Size: {0},\n1. {1},\n2. {2}\n".format(
+        #         only_softmax[0].size(),
+        #         only_softmax[0, :, 5, 128].to('cpu', float),
+        #         only_softmax[0, :, 128, 128].to('cpu', float)))
+
         if self.num_classes > 1:
             x_out = F.log_softmax(f5, dim=1)
+
+            # print(
+            #     "Post-logsoftmax state; Size: {0},\n1. {1},\n2. {2}\n\n\n".format(
+            #         x_out[0].size(),
+            #         x_out[0, :, 5, 128].to(
+            #             'cpu', float),
+            #         x_out[0, :, 128, 128].to('cpu', float)))
         else:
             x_out = f5
         return x_out
