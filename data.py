@@ -17,7 +17,8 @@ data_dirs = set_data_environment(path_to_data, subdirs={
     "test images skyFinder": "test_skyFinder",
     "test labels skyFinder": "test_skyFinder_labels",
     "test iPhoneXR images": "test_iphoneXR_v",
-    "test iPhoneXR labels": "test_iphoneXR_v_labels"
+    "test iPhoneXR labels": "test_iphoneXR_v_labels",
+    "test iPhoneXR images without labels": "test_iphoneXR_h"
 })
 data_dirs.set_translation(
     lambda image_name: f"{image_name.stem}_L.png"
