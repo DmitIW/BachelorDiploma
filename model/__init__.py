@@ -18,5 +18,12 @@ __all__ = [
     get_jaccard_index_one_class_partial,
     get_jaccard_index_zero_class_partial,
     f1_score,
-    tensorboard_cb
+    tensorboard_cb,
+    decoder_high_output,
+    decoder_middle_output,
+    decoder_first_output,
+    encoder_first_output,
+    encoder_low_output,
+    encoder_middle_output,
+    pre_encoder_output
 ]
