@@ -4,6 +4,7 @@ from functools import partial
 __decoder_outputs__ = []
 __encoder_outputs__ = []
 __pre_encoder_outputs__ = []
+__classifier_middle__ = []
 
 
 def __rescale__(inp_tensor) -> Tensor:
@@ -51,6 +52,9 @@ encoder_low_output = partial(__encoder_output__, __encoder_low_output_position__
 
 __pre_encoder_output__ = partial(__output__, __pre_encoder_outputs__)
 pre_encoder_output = partial(__pre_encoder_output__, 0)
+
+__classifier_middle_output__ = partial(__output__, __classifier_middle__)
+classifier_middle_output = partial(__classifier_middle_output__, 0)
 
 
 class DecoderBlockLinkNet(nn.Module):
@@ -115,6 +119,7 @@ def __save_outputs__(outputs_container: list, outputs: list) -> None:
 __save_decoder_outputs__ = partial(__save_outputs__, __decoder_outputs__)
 __save_encoder_outputs__ = partial(__save_outputs__, __encoder_outputs__)
 __save_pre_encoder_outputs__ = partial(__save_outputs__, __pre_encoder_outputs__)
+__save_classifier_outputs__ = partial(__save_outputs__, __classifier_middle__)
 
 
 class LinkNet34(nn.Module):
@@ -148,6 +153,9 @@ class LinkNet34(nn.Module):
         self.finalrelu2 = nn.ReLU(inplace=True)
         self.finalconv3 = nn.Conv2d(32, num_classes, 2, padding=1)
 
+        self.dropout1 = nn.Dropout2d(0.5, False)
+        self.dropout2 = nn.Dropout2d(0.3, False)
+
         self.with_debug_info = debug_info
         self.save_encoder = save_encoder_outputs
         self.save_decoder = save_decoder_outputs
@@ -173,9 +181,11 @@ class LinkNet34(nn.Module):
         # Final Classification
         f1 = self.finaldeconv1(d1)
         f2 = self.finalrelu1(f1)
-        f3 = self.finalconv2(f2)
+        dr1 = self.dropout1(f2)
+        f3 = self.finalconv2(dr1)
         f4 = self.finalrelu2(f3)
-        f5 = self.finalconv3(f4)
+        dr2 = self.dropout2(f4)
+        f5 = self.finalconv3(dr2)
 
         if self.num_classes > 1:
             x_out = F.log_softmax(f5, dim=1)
@@ -186,5 +196,6 @@ class LinkNet34(nn.Module):
         _ = self.save_encoder and __save_pre_encoder_outputs__([x])
         _ = self.save_encoder and __save_encoder_outputs__([e1, e2, e3, e4])
         _ = self.save_decoder and __save_decoder_outputs__([d1, d2, d3, d4])
+        _ = self.save_decoder and __save_classifier_outputs__([dr1])
 
         return x_out

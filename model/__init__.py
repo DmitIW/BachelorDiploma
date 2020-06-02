@@ -25,5 +25,6 @@ __all__ = [
     encoder_first_output,
     encoder_low_output,
     encoder_middle_output,
-    pre_encoder_output
+    pre_encoder_output,
+    classifier_middle_output
 ]
