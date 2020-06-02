@@ -181,11 +181,11 @@ class LinkNet34(nn.Module):
         # Final Classification
         f1 = self.finaldeconv1(d1)
         f2 = self.finalrelu1(f1)
-        dr1 = self.dropout1(f2)
-        f3 = self.finalconv2(dr1)
+        # dr1 = self.dropout1(f2)
+        f3 = self.finalconv2(f2)
         f4 = self.finalrelu2(f3)
-        dr2 = self.dropout2(f4)
-        f5 = self.finalconv3(dr2)
+        # dr2 = self.dropout2(f4)
+        f5 = self.finalconv3(f4)
 
         if self.num_classes > 1:
             x_out = F.log_softmax(f5, dim=1)

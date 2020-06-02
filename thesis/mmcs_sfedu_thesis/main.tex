@@ -1,6 +1,7 @@
 \usepackage{amsmath}
 \usepackage{cleveref}
-
+\usepackage[toc,page]{appendix}
+\usepackage{listings}
 % В этом файле следует писать текст работы, разбивая его на
 % разделы (section), подразделы (subsection) и, если нужно,
 % главы (chapter).
@@ -9,6 +10,18 @@
 % в файле SETUP.tex
 
 \input{preamble.tex}
+
+\lstset
+{ %Formatting for code in appendix
+    language=Python,
+    basicstyle=\footnotesize,
+    numbers=left,
+    stepnumber=1,
+    showstringspaces=false,
+    tabsize=1,
+    breaklines=true,
+    breakatwhitespace=false,
+}
 
 \begin{document}
 
@@ -602,9 +615,256 @@ SkyFinder представляет собой набор из 90.000 фотог�
 Учитывалось, что большое количество изображений из новых данных может оказать негативный эффект на метриках качества,
 из-за погрешностей в разметке.
 
-\section{Анализ результатов}
+Для получения данных с синтетической разметкой использовалась сеть, оубченная только на SkyFinder.
+При этом на объединение данных сеть обучалась с нуля, не используя до этого подготовленные веса.
+
+
+\section{Результаты}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{img/ocp_against_const.png}
+    \caption{Сравнение результатов one cycle policy и константого значения learning rate}
+    \label{fig:ocp_against_const}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{img/data_count_compare.png}
+    \caption{Сравнение результатов для обучения с использованием синтетически размеченных данных (верхний ряд) с обучением только на SkyFinder}
+    \label{fig:data_compare}
+\end{figure}
+
+На~\ref{fig:ocp_against_const} представлено сравнение техники one cycle policy настройки гиперпараметра~(голубой) с обучением,
+в течение которого learning rate оставался постоянным~(бурый).
+Как видно из графика, использование более высокого значения в первых итерациях позволило быстрее прийти к минимуму,
+а последующее уменьшение learning rate улучшило сходимость.
+На~\ref{fig:ocp_against_const}.a отображен график функции потерь, на~\ref{fig:ocp_against_const}.b и~\ref{fig:ocp_against_const}.c
+графики значений метрики~$\mathrm{IoU}$ для классов неба и прочих объектов соответственно.
+
+На~\ref{fig:data_compare} отражены результаты работы алгоритма сегментации.
+Красным цветом выделен сгенерированный сегмент неба.
+При использовании доменной адаптации~(верхний ряд) можно видеть лучшее качество работы алгоритма с сегментами неба,
+в которых представлено большее цветовое разнообразие.
+При этом подход без использования смены домена~(нижний ряд) склонен выделять как ложноположительные сегменты неба при близости цветов~(\ref{fig:data_compare}.5) между объектами разных классов,
+так и оставлять ложноотрицательные регионы для резких переходов между цветам~(\ref{fig:data_compare}.6).
 
 \Conc
+
+В рамках данной работы был освещен вопрос семантического анализа фотографий искусственными нейронными сетями.
+В качестве предмета была выбрана задача сегментации пикселей изображения на два класса: принадлежащих области неба и относящихся к прочим объектам на снимке.
+Поставленная задача решалась применением глубоких сверточных сетей--ИНС со слоями свертки.
+Качество алгоритма было улучшено с помощью корректировки результирующей маски алгоритмами компьютерного зрения.
+При обучении сети использовались техники циклического изменения гиперпараметров learning rate и momentum,
+что также способствовало увеличению метрики~$\mathrm{IoU}$.
+
+Для устранения влияния различий между качеством изображений в данных датасета SkyFinder и данных целевого домен,
+был применена доменная адаптация с помощью синтетически размеченных данных.
+Замечу, что использование изображений с искусственной разметкой показывает достаточно высокие результаты
+при низких временных затратах на подготовку данных.
+
+Итоговое решение имеет средний показатель~$\mathrm{IoU}$ между классами равный~$94\%$.
+Сериализованная на физическом носители модель занимает~$87.4\mathrm{MB}$.
+
+\appendix
+
+\section{Реализация сети c LinkNet декодером}
+
+\begin{lstlisting}[python]
+    class DecoderBlockLinkNet(nn.Module):
+        def __init__(self, in_channels, n_filters):
+            super().__init__()
+            self.relu = nn.ReLU(inplace=True)
+
+            self.conv1 = nn.Conv2d(in_channels, in_channels // 4, 1)
+            self.norm1 = nn.BatchNorm2d(in_channels // 4)
+
+            self.deconv2 = nn.ConvTranspose2d(in_channels // 4, in_channels // 4, kernel_size=4, stride=2, padding=1, output_padding=0)
+            self.norm2 = nn.BatchNorm2d(in_channels // 4)
+
+            self.conv3 = nn.Conv2d(in_channels // 4, n_filters, 1)
+            self.norm3 = nn.BatchNorm2d(n_filters)
+
+        def forward(self, x):
+            x = self.conv1(x)
+            x = self.norm1(x)
+            x = self.relu(x)
+            x = self.deconv2(x)
+            x = self.norm2(x)
+            x = self.relu(x)
+            x = self.conv3(x)
+            x = self.norm3(x)
+            x = self.relu(x)
+            return x
+
+
+    class LinkNet34(nn.Module):
+        def __init__(self, num_classes=1, num_channels=3, pretrained=True, debug_info=False,
+                     save_decoder_outputs=False, save_encoder_outputs=False):
+            super().__init__()
+            assert num_channels == 3
+            self.num_classes = num_classes
+            filters = [64, 128, 256, 512] # кол-во карт признаков на разных уровнях
+            resnet = models.resnet34(pretrained=pretrained)
+
+            self.firstconv = resnet.conv1
+            self.firstbn = resnet.bn1
+            self.firstrelu = resnet.relu
+            self.firstmaxpool = resnet.maxpool
+            self.encoder1 = resnet.layer1
+            self.encoder2 = resnet.layer2
+            self.encoder3 = resnet.layer3
+            self.encoder4 = resnet.layer4
+
+            self.decoder4 = DecoderBlockLinkNet(filters[3], filters[2])
+            self.decoder3 = DecoderBlockLinkNet(filters[2], filters[1])
+            self.decoder2 = DecoderBlockLinkNet(filters[1], filters[0])
+            self.decoder1 = DecoderBlockLinkNet(filters[0], filters[0])
+
+            self.finaldeconv1 = nn.ConvTranspose2d(filters[0], 32, 3, stride=2)
+            self.finalrelu1 = nn.ReLU(inplace=True)
+            self.finalconv2 = nn.Conv2d(32, 32, 3)
+            self.finalrelu2 = nn.ReLU(inplace=True)
+            self.finalconv3 = nn.Conv2d(32, num_classes, 2, padding=1)
+
+            self.dropout1 = nn.Dropout2d(0.5, False)
+            self.dropout2 = nn.Dropout2d(0.3, False)
+
+            self.with_debug_info = debug_info
+            self.save_encoder = save_encoder_outputs
+            self.save_decoder = save_decoder_outputs
+
+        # noinspection PyCallingNonCallable
+        def forward(self, x):
+            x = self.firstconv(x)
+            x = self.firstbn(x)
+            x = self.firstrelu(x)
+            x = self.firstmaxpool(x)
+            e1 = self.encoder1(x)
+            e2 = self.encoder2(e1)
+            e3 = self.encoder3(e2)
+            e4 = self.encoder4(e3)
+
+            d4 = self.decoder4(e4) + e3
+            d3 = self.decoder3(d4) + e2
+            d2 = self.decoder2(d3) + e1
+            d1 = self.decoder1(d2)
+
+            f1 = self.finaldeconv1(d1)
+            f2 = self.finalrelu1(f1)
+            dr1 = self.dropout1(f2)
+            f3 = self.finalconv2(dr1)
+            f4 = self.finalrelu2(f3)
+            dr2 = self.dropout2(f4)
+            f5 = self.finalconv3(dr2)
+
+            x_out = F.log_softmax(f5, dim=1)
+
+            _ = self.with_debug_info and __print_info__(f5, x_out)
+            _ = self.save_encoder and __save_pre_encoder_outputs__([x])
+            _ = self.save_encoder and __save_encoder_outputs__([e1, e2, e3, e4])
+            _ = self.save_decoder and __save_decoder_outputs__([d1, d2, d3, d4])
+            _ = self.save_decoder and __save_classifier_outputs__([dr1])
+
+            return x_out
+\end{lstlisting}
+
+Строчки 1--25: Класс декодер-блока по схеме LinkNet.
+Функция forward (стр. 15) -- прямой проход по сети.
+Библиотека глубокого обучения PyTorch, при использовании слоев из ее состава,
+позволяет не определять функции для обновления весов алгоритмам обратного распространения.
+В замен этого на каждой итерации обучения используются предописанные в самой библиотеке вычисления.
+
+Строчки 28--96: Класс с полным описанием архитектуры сети.
+
+Строчки 66--73: Исполнение енкодер-части сети.
+
+Строчки 75--88: Исполнение декодер-части сети с последующей классификацией и применением результирующего Softmax.
+
+Строчки 90--94: Снятие значений карт признаков с различных уровней сети и вывод отладочной информации.
+За счет применения механизма ленивого выполнения в языке Python,
+получается отказаться от оператора условного выбора, выполняемого за большое кол-во инструкций процессора
+
+\section{Реализация многоресурсного загрузчика}
+
+\begin{lstlisting}[python]
+    class SeveralSourceDataset(t_Dataset):
+    _modes = [
+        "absolute", "relative"
+    ]
+
+    def __init__(self, sources: Union[List[Union[Path, str]], Tuple[Union[Path, str]], Path, str],
+                 batch_consistency: Union[List[int], Tuple[int]],
+                 label_from_func: Callable, transforms: List[Any], size: int):
+        t = type(sources)
+        if t == Path or t == str:
+            sources = [sources]
+
+        self._sources: List[Path] = []
+        for s in sources:
+            if type(s) == str:
+                self._sources.append(Path(s))
+            else:
+                self._sources.append(s)
+
+        self._sources_count = len(self._sources)
+
+        self._bc = batch_consistency
+
+        if len(self._bc) != self._sources_count:
+            raise RuntimeError("Unexpected consistency value")
+
+        self._current_index = 0
+        self._index_to_source = []
+        index: int = 0
+        for bc in self._bc:
+            self._index_to_source += [index for _ in range(bc)]
+            index += 1
+
+        self.images: List[List[Path]] = []
+        self.labels: List[List[Path]] = []
+
+        self._len: int = 0
+        index: int = 0
+        for source in self._sources:
+            self.images.append([])
+            self.labels.append([])
+            for image in source.iterdir():
+                self.images[index].append(image)
+                self.labels[index].append(label_from_func(image))
+            self._len += len(self.images[index])
+            index += 1
+
+        self._inner_indexes: List[int] = [0 for _ in range(self._sources_count)]
+        if type(transforms) != list:
+            raise RuntimeError(
+                "Unexpected transforms type. Should be list of fastai.vision.image.RandTransform or list of list of fastai.vision.image.RandTransform.")
+        if len(transforms) > 0:
+            if type(transforms[0]) == fastai.vision.image.RandTransform:
+                transforms = [transforms]
+
+        self.transform: List[List[Any]] = transforms
+        self._size = size
+
+    def __len__(self) -> int:
+        return self._len
+
+    def get(self, item):
+        mod = len(self._index_to_source)
+        index = self._index_to_source[item % mod]
+        inner_index = self._inner_indexes[index]
+        img = open_image(self.images[index][inner_index])
+        label = open_mask(self.labels[index][inner_index], div=True)
+        inner_index += 1
+        self._inner_indexes[index] = inner_index % len(self.images[index])
+        return img, label
+
+    def __getitem__(self, item):
+        img, lbl = self.get(item)
+        img = img.resize(self._size).data
+        lbl = lbl.resize(self._size).data.squeeze(dim=0)
+        return img, lbl
+\end{lstlisting}
 
 % Печать списка литературы (библиографии)
 \printbibliography[%{}
