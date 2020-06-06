@@ -1,8 +1,8 @@
 import subprocess
 import sys
 
-path_to_tex_file = "/home/dmitri/PycharmProjects/BachelorDiploma/thesis/presentation/presentation.tex"
 executable_builder = "/usr/bin/xelatex"
+path_to_tex_file = "/home/dmitri/PycharmProjects/BachelorDiploma/thesis/presentation/presentation.tex"
 
 
 def main() -> None:
