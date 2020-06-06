@@ -1,8 +1,10 @@
+%& -job-name=presentation
 \documentclass[
     10pt,           % размер шрифта
     aspectratio=43  % соотношение сторон слайдов
 ]{beamer}
 
+\def\jobname{presentation}
     
 %% Tема презентации
 \usetheme[]{metropolis}         
@@ -131,8 +133,7 @@
 %% Настройки пользователя
 %% --------------------------------------------------------------
 
-%% Путь к каталогу с изображениями
-\graphicspath{{images/}}
+\graphicspath{{/home/dmitri/PycharmProjects/BachelorDiploma/thesis/mmcs_sfedu_thesis/img/}}
 %% Параметры темы
 %% http://mirrors.mi.ras.ru/CTAN/macros/latex/contrib/beamer-contrib/themes/metropolis/doc/metropolistheme.pdf
 \metroset{
@@ -142,37 +143,19 @@
 }
 
 
-\title{Разработка и применение алгоритмов определения линейных параметров движущихся объектов методами компьютерного зрения}
+\title{Семантический анализ фотографий с помощью глубоких нейронных сетей}
 %\titlegraphic{\includegraphics[height=1.0cm]{sfedu_logo.png}}
 %\subtitle{}
 
 \author{
 02.03.02 - Фундаментальная информатика и информационные технологии
 \vskip 1em 
-Выполнил:\\студент 4 курса И.\,В. Гончаров 
+Выполнил:\\студент 4 курса Д.\,И. Ивахненко
 \vskip 1em 
-Научный руководитель:\\ к.\,ф.-м.\,н., доцент В.\,В. Махно 
+Научный руководитель:\\ к.\,ф.-м.\,н., ст.преп. М.\,В. Юрушкин
 \vskip 1em
 }
 
-\date{20 мая 2020 г.}
+\date{2020 г.}
 
 \institute{Институт ММиКН им. И.И. Воровича, Южный Федеральный Университет}
-
-\begin{document}
-    \maketitle
-    \include{slides/01}
-    \include{slides/02}
-    \include{slides/03}
-    \include{slides/04}
-    \include{slides/05}
-    \include{slides/06}
-    \include{slides/07}
-    \include{slides/08}
-    \include{slides/09}
-    \include{slides/10}
-    \include{slides/11}
-    \include{slides/12}
-    \include{slides/13}
-    \include{slides/14}
-\end{document}
