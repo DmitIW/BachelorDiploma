@@ -1,0 +1,19 @@
+% !TEX root = ../presentation.tex
+
+\begin{frame}{Математическая модель проективной камеры}
+    \begin{equation*}
+    \textbf{x} = KR\begin{bmatrix}E | -\hat{C}\end{bmatrix}\textbf{X}
+\end{equation*}
+где
+\begin{itemize}[noitemsep]
+    \item $\textbf{X}$ -- точка пространства в мировой системе координат,
+    \item $\textbf{x}$ -- соответствующая $\textbf{X}$ точка плоскости изображения в системе координат плоскости изображения,
+    \item $K$ -- верхнетреугольная матрица размера $3$x$3$ внутренних параметров камеры (\textit{калибровочная матрица камеры}),
+    \item $R$ -- матрица поворота размера $3$x$3$,  
+    \item $\begin{bmatrix}E | -\hat{C}\end{bmatrix}$  = $\begin{bmatrix} 
+    1 & 0 & 0 & -\hat{C_{1}} \\
+    0 & 1 & 0 & -\hat{C_{2}} \\ 
+    0 & 0 & 1 & -\hat{C_{3}} \end{bmatrix}$
+    \item $\hat{C}$ -- координаты центра камеры в мировой системе координат
+\end{itemize}
+\end{frame}
