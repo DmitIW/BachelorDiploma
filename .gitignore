@@ -33,3 +33,16 @@
 /plotter/unet_own.synctex.gz
 /thesis/mmcs_sfedu_thesis/texput.log
 .idea/
+out/
+thesis/mmcs_sfedu_thesis/img/conv_transposed/
+thesis/mmcs_sfedu_thesis/img/dec_out/
+thesis/mmcs_sfedu_thesis/img/example/
+thesis/mmcs_sfedu_thesis/img/find_contr/
+thesis/mmcs_sfedu_thesis/img/iou_vis/
+thesis/mmcs_sfedu_thesis/img/mask_results/
+thesis/mmcs_sfedu_thesis/img/new_arch/
+thesis/mmcs_sfedu_thesis/img/normalization/
+thesis/mmcs_sfedu_thesis/img/pre_classified_output/
+thesis/mmcs_sfedu_thesis/img/results/
+thesis/mmcs_sfedu_thesis/img/sky_segmentation/
+thesis/mmcs_sfedu_thesis/img/softmax_debug_info/
